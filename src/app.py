@@ -36,7 +36,8 @@ def handle_invalid_usage(error):
 def sitemap():
     return generate_sitemap(app)
 
-# inicio código 
+
+# Get a list of all the blog post users
 
 @app.route('/user', methods=['GET'])
 def get_user():
@@ -45,10 +46,9 @@ def get_user():
     #user_list= list(results)
   
     return jsonify( results), 200
+# 
 
-# fin del código
-
-# inicio código 
+# Get a list of all the people in the database
 
 @app.route('/people', methods=['GET'])
 def get_people():
@@ -57,9 +57,22 @@ def get_people():
     
     return jsonify( results), 200
 
-# fin del código
+# Get a one single people information
 
-# inicio código 
+@app.route('/people/<int:people_id>', methods=['GET'])
+def get_person(people_id):
+    person = People.query.get(people_id)
+ # If the planet doesn't exist, return a 404 error
+    if person is None:
+        return jsonify({'error': 'Planet not found'}), 404
+
+    # Serialize the retrieved planet to JSON
+    serialized_person = person.serialize()
+    
+    return jsonify(serialized_person), 200
+
+
+# Get a list of all the planets in the database 
 
 @app.route('/planets', methods=['GET'])
 def get_planets():
@@ -68,7 +81,21 @@ def get_planets():
     
     return jsonify( results), 200
 
-# fin del código
+# Get one single planet information
+
+@app.route('/planets/<int:planet_id>', methods=['GET'])
+def get_planet(planet_id):
+    planet = Planets.query.get(planet_id)
+
+    # If the planet doesn't exist, return a 404 error
+    if planet is None:
+        return jsonify({'error': 'Planet not found'}), 404
+
+    # Serialize the retrieved planet to JSON
+    serialized_planet = planet.serialize()
+
+    # Return the JSON-serialized planet object
+    return jsonify(serialized_planet), 200
 
 
 

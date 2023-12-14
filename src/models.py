@@ -17,7 +17,7 @@ class User(db.Model):
             "id": self.id,
             "username":self.username,
             "email": self.email,
-            " is_active":self.is_active,
+            "is_active":self.is_active,
              
             # do not serialize the password, its a security breach
         }
@@ -36,11 +36,11 @@ class People(db.Model):
     def serialize(self):
         return {
             "id": self.id,
-            " character_name": self. character_name,
-            " gender ":self.gender ,
-             "birth_year":self.birth_year,
-            " hair_color ":self.hair_color ,
-             "eye_color":self.eye_color,
+            "character_name": self. character_name,
+            "gender ":self.gender ,
+            "birth_year":self.birth_year,
+            "hair_color ":self.hair_color ,
+            "eye_color":self.eye_color,
     
         }
     
@@ -58,12 +58,11 @@ class Planets(db.Model):
     def serialize(self):
         return {
             "id": self.id,
-            " planet_name": self. planet_name,
-            " diameter  ":self. diameter  ,
-             " climate":self. climate,
-            "  terrain ":self. terrain ,
-             "population":self.population,
-
-
+            "planet_name": self. planet_name,
+            "diameter  ":self. diameter  ,
+            "climate":self. climate,
+            "terrain ":self. terrain ,
+            "population":self.population,
         }
+
     
