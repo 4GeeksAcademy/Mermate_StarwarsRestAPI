@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User, People, Planets
+from models import db, User, People, Planet, Favourite_people,Favourite_planet
 #from models import Person
 
 app = Flask(__name__)
@@ -37,18 +37,21 @@ def sitemap():
     return generate_sitemap(app)
 
 
-# Get a list of all the blog post users
+# [GET]Listar todos los usuarios del blog
 
 @app.route('/user', methods=['GET'])
 def get_user():
     all_users=User.query.all()
     results= list( map( lambda user:user.serialize(), all_users ))
-    #user_list= list(results)
+ 
   
     return jsonify( results), 200
-# 
+   
 
-# Get a list of all the people in the database
+#  ['GET'] Listar todos los favoritos que pertenecen al usuario actual.
+
+
+#  ['GET']Listar todos los registros de people en la base de datos
 
 @app.route('/people', methods=['GET'])
 def get_people():
@@ -57,46 +60,91 @@ def get_people():
     
     return jsonify( results), 200
 
-# Get a one single people information
+#  ['GET']Listar la información de una sola people
 
 @app.route('/people/<int:people_id>', methods=['GET'])
 def get_person(people_id):
     person = People.query.get(people_id)
- # If the planet doesn't exist, return a 404 error
+ 
     if person is None:
         return jsonify({'error': 'Planet not found'}), 404
-
-    # Serialize the retrieved planet to JSON
-    serialized_person = person.serialize()
     
-    return jsonify(serialized_person), 200
+    return jsonify(person.serialize()), 200
 
 
-# Get a list of all the planets in the database 
+#  ['GET']Listar los registros de planets en la base de datos
 
 @app.route('/planets', methods=['GET'])
 def get_planets():
-    all_planets=Planets.query.all()
+    all_planets=Planet.query.all()
     results= list( map( lambda Planets:Planets.serialize(), all_planets ))
     
     return jsonify( results), 200
 
-# Get one single planet information
+#  ['GET'] Listar la información de un solo planet
 
 @app.route('/planets/<int:planet_id>', methods=['GET'])
 def get_planet(planet_id):
-    planet = Planets.query.get(planet_id)
+    planet = Planet.query.get(planet_id)
 
-    # If the planet doesn't exist, return a 404 error
     if planet is None:
         return jsonify({'error': 'Planet not found'}), 404
 
-    # Serialize the retrieved planet to JSON
-    serialized_planet = planet.serialize()
+    return jsonify(planet.serialize()), 200
 
-    # Return the JSON-serialized planet object
-    return jsonify(serialized_planet), 200
 
+#^[POST] añade un nuevo planeta 
+
+    
+@app.route('/planet', methods=['POST'])
+def add_new_planet():
+
+    body = request.get_json()
+    
+    if (
+        "name" not in body
+        or "population" not in body
+        or "terrain" not in body
+        or "climate" not in body
+        or "diameter" not in body
+    ):
+        return jsonify({"error": "incomplete data"}), 400
+    
+    #me = User('admin', 'admin@example.com')
+    #db.session.add(me)
+    #db.session.commit()
+   
+    new_planet = Planet(
+        name=body["name"],
+        population=body["population"],
+        terrain=body["terrain"],
+        climate=body["climate"],
+        diameter=body["diameter"]
+    )
+    
+    db.session.add(new_planet)
+    db.session.commit()
+
+    response_body = {
+        "msg": "New planet added successfully"
+    }
+
+    return jsonify(response_body), 200
+
+
+
+# [POST] Añade un nuevo planet favorito al usuario actual con el planet id = planet_id.
+
+
+
+# [POST] Añade una nueva people favorita al usuario actual con el people.id = people_id.
+
+
+
+# [DELETE] Elimina un planet favorito con el id = planet_id`.
+
+
+# [DELETE] Elimina una people favorita con el id = people_id.
 
 
 

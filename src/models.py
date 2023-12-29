@@ -8,6 +8,24 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(80), unique=False, nullable=False)
     is_active = db.Column(db.Boolean(), unique=False, nullable=False)
+    #favourite_planet = db.relationship('Planet', backref='User', lazy=True)
+    #favourite_people = db.relationship('People', backref='User', lazy=True)
+
+   
+
+#class Person(db.Model):
+    #id = db.Column(db.Integer, primary_key=True)
+   # name = db.Column(db.String(50), nullable=False)
+   # addresses = db.relationship('Address', backref='person', lazy=True)
+
+#class Address(db.Model):
+    #id = db.Column(db.Integer, primary_key=True)
+    #email = db.Column(db.String(120), nullable=False)
+   # person_id = db.Column(db.Integer, db.ForeignKey('person.id'),
+        #nullable=False)
+
+  
+    
 
     def __repr__(self):
         return '<User %r>' % self.username
@@ -30,6 +48,8 @@ class People(db.Model):
     hair_color = db.Column(db.String(80), unique=False, nullable=False)
     eye_color= db.Column(db.String(80), unique=False, nullable=False)
 
+    
+
     def __repr__(self):
         return '<People %r>' % self.character_name
 
@@ -44,16 +64,17 @@ class People(db.Model):
     
         }
     
-class Planets(db.Model):
+class Planet(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     planet_name=db.Column(db.String(120), unique=True, nullable=False)
     diameter   = db.Column(db.String(120), unique=False, nullable=False)
     climate = db.Column(db.String(80), unique=False, nullable=False)
     terrain = db.Column(db.String(80), unique=False, nullable=False)
     population= db.Column(db.String(80), unique=False, nullable=False)
+    
 
     def __repr__(self):
-        return '< Planets %r>' % self.planet_name
+        return '< Planet %r>' % self.planet_name
 
     def serialize(self):
         return {
@@ -65,4 +86,34 @@ class Planets(db.Model):
             "population":self.population,
         }
 
-    
+class  Favourite_planet(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    user = db.relationship("User")
+    planet_id = db.Column(db.Integer, db.ForeignKey("planet.id"), nullable=False)
+    planet = db.relationship("Planet")
+    def __repr__(self):
+        return '<favourite_planet %r>' % self.id
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "planet_id": self.planet_id,
+            "user_id": self.user_id,
+        }
+
+class  Favourite_people(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    user = db.relationship("User")
+    people_id = db.Column(db.Integer, db.ForeignKey("people.id"), nullable=False)
+    people = db.relationship("People")
+    def __repr__(self):
+        return '<favourite_people %r>' % self.id
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "planet_id": self.planet_id,
+            "user_id": self.user_id,
+        }
