@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User, People, Planet, Favourite_people,Favourite_planet
+from models import db, User, Character, Planet,Fav_Characters,  Fav_Planets
 #from models import Person
 
 app = Flask(__name__)
@@ -50,21 +50,29 @@ def get_user():
 
 #  ['GET'] Listar todos los favoritos que pertenecen al usuario actual.
 
+@app.route('/fav_characters', methods=['GET'])
+def get_fav_characters():
+    fav_characters = Fav_Characters.query.all()
+    results = list(map(lambda Character: Character.serialize(), fav_characters))
 
-#  ['GET']Listar todos los registros de people en la base de datos
+    return jsonify(results), 200
 
-@app.route('/people', methods=['GET'])
-def get_people():
-    all_people=People.query.all()
-    results= list( map( lambda People:People.serialize(), all_people ))
+
+
+#  ['GET']Listar todos los registros de Character en la base de datos
+
+@app.route('/Character', methods=['GET'])
+def get_Character():
+    all_Character=Character.query.all()
+    results= list( map( lambda Character:Character.serialize(), all_Character ))
     
     return jsonify( results), 200
 
-#  ['GET']Listar la información de una sola people
+#  ['GET']Listar la información de una sola Character
 
-@app.route('/people/<int:people_id>', methods=['GET'])
-def get_person(people_id):
-    person = People.query.get(people_id)
+@app.route('/Character/<int:Character_id>', methods=['GET'])
+def get_person(Character_id):
+    person = Character.query.get(Character_id)
  
     if person is None:
         return jsonify({'error': 'Planet not found'}), 404
@@ -96,7 +104,7 @@ def get_planet(planet_id):
 #^[POST] añade un nuevo planeta 
 
     
-@app.route('/planet', methods=['POST'])
+@app.route('/planets', methods=['POST'])
 def add_new_planet():
 
     body = request.get_json()
@@ -135,16 +143,61 @@ def add_new_planet():
 
 # [POST] Añade un nuevo planet favorito al usuario actual con el planet id = planet_id.
 
+@app.route('/fav_planets', methods=['POST'])
+def add_new_fav_planet():
+    request_body_fav_planet = request.get_json()
+
+    new_fav_planet = Fav_Planets(
+    planet=request_body_fav_planet["planet"], 
+    user=request_body_fav_planet["user"])
+
+    db.session.add(new_fav_planet)
+    db.session.commit()
+
+    return jsonify(request_body_fav_planet), 200
 
 
-# [POST] Añade una nueva people favorita al usuario actual con el people.id = people_id.
+   
+# [POST] Añade una nuevo Character favorito.
+@app.route('/fav_characters', methods=['POST'])
+def add_new_fav_character():
+    request_body_fav_character = request.get_json()
+
+    new_fav_character = Fav_Characters(
+    character=request_body_fav_character["character"], user=request_body_fav_character["user"])
+    db.session.add(new_fav_character)
+    db.session.commit()
+
+    return jsonify(request_body_fav_character), 200
+
+
+# [DELETE] Elimina un planet favorito.
+@app.route('/fav_planets/<int:fav_planets_id>', methods=['DELETE'])
+def delete_fav_planet(fav_planets_id):
+    fav_planet = Fav_Planets.query.get(fav_planets_id)
+
+    if not fav_planet:
+        return jsonify({'message': 'Fav planet not found'}), 404
+
+    db.session.delete(fav_planet)
+    db.session.commit()
+
+    return jsonify({'message': f'Fav planet with ID {fav_planets_id} deleted successfully'}), 200
 
 
 
-# [DELETE] Elimina un planet favorito con el id = planet_id`.
+# [DELETE] Elimina una Character favorito.
+@app.route('/fav_characters/<int:fav_characters_id>', methods=['DELETE'])
+def delete_fav_character(fav_characters_id):
+    fav_character = Fav_Characters.query.get(fav_characters_id)
 
+    if not fav_character:
+        return jsonify({'message': 'Fav Character not found'}), 404
 
-# [DELETE] Elimina una people favorita con el id = people_id.
+    db.session.delete(fav_character)
+    db.session.commit()
+
+    return jsonify({'message': f'Fav character with ID {fav_characters_id} deleted successfully'}), 200
 
 
 
